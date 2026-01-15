@@ -2,11 +2,9 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-
-  <!-- IMPORTANTE PARA MOBILE -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Pagamento PIX</title>
+  <title>Negociação • Pagamento PIX</title>
 
   <style>
     * {
@@ -14,59 +12,78 @@
     }
 
     body {
-      font-family: Arial, sans-serif;
-      background: #f5f5f5;
       margin: 0;
       min-height: 100vh;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(160deg, #0b1f1a, #020c09);
       display: flex;
       justify-content: center;
       align-items: center;
       padding: 16px;
+      color: #e0fff6;
     }
 
     .box {
-      background: white;
-      padding: 24px;
-      border-radius: 14px;
       width: 100%;
-      max-width: 500px;
-      min-height: 80vh;
+      max-width: 520px;
+      min-height: 85vh;
+      background: rgba(10, 40, 30, 0.95);
+      border-radius: 18px;
+      padding: 28px 22px;
       display: flex;
       flex-direction: column;
       justify-content: center;
       text-align: center;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+      box-shadow: 0 0 40px rgba(0, 255, 180, 0.15);
+      border: 1px solid rgba(0, 255, 180, 0.15);
+    }
+
+    .tag {
+      font-size: 0.8rem;
+      letter-spacing: 1px;
+      color: #00ffc8;
+      margin-bottom: 6px;
     }
 
     h2 {
-      font-size: 1.6rem;
-      margin-bottom: 12px;
+      margin: 0 0 12px;
+      font-size: 1.7rem;
+      color: #b8ffe9;
     }
 
     p {
       font-size: 1rem;
-      margin: 8px 0;
+      color: #c9fff0;
+      margin-bottom: 14px;
+    }
+
+    .qr {
+      background: #ffffff;
+      padding: 12px;
+      border-radius: 14px;
+      display: inline-block;
+      margin: 10px auto 20px;
     }
 
     .pix {
       word-break: break-all;
-      font-size: 0.9rem;
-      margin: 20px 0;
-      color: #333;
-      background: #f1f1f1;
+      font-size: 0.85rem;
+      background: rgba(0,0,0,0.4);
       padding: 14px;
-      border-radius: 10px;
+      border-radius: 12px;
+      margin-bottom: 18px;
+      border: 1px solid rgba(0, 255, 180, 0.2);
     }
 
     button {
-      background: #00bfa5;
-      color: white;
+      background: linear-gradient(135deg, #00ffc8, #00cfa1);
+      color: #00241b;
       border: none;
       padding: 18px;
       font-size: 1.15rem;
-      border-radius: 10px;
+      border-radius: 14px;
       cursor: pointer;
-      margin-top: 10px;
+      font-weight: bold;
     }
 
     button:active {
@@ -74,9 +91,9 @@
     }
 
     #msg {
-      font-size: 1rem;
       margin-top: 14px;
-      color: green;
+      font-size: 0.95rem;
+      color: #7dffe1;
     }
 
     @media (min-width: 768px) {
@@ -89,23 +106,31 @@
 <body>
 
   <div class="box">
-    <h2>PIX Copia e Cola</h2>
-    <p>Clique no botão abaixo para copiar:</p>
+    <div class="tag">NEGOCIAÇÃO</div>
+    <h2>Pagamento via PIX</h2>
+    <p>Escaneie o QR Code ou copie o código abaixo para concluir o acordo.</p>
 
+    <!-- QR CODE -->
+    <div class="qr">
+      <img 
+        src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=00020101021226940014br.gov.bcb.pix2572qrcode.hyperwalletip.com.br/dynamic/33c16a84-d84e-4db2-bd20-9008a60d0f1c5204000053039865802BR5910VCOIN%20LTDA6009Sao%20Paulo62070503***63041F95"
+        alt="QR Code PIX">
+    </div>
+
+    <!-- PIX COPIA E COLA -->
     <div id="pix" class="pix">
 00020101021226940014br.gov.bcb.pix2572qrcode.hyperwalletip.com.br/dynamic/33c16a84-d84e-4db2-bd20-9008a60d0f1c5204000053039865802BR5910VCOIN LTDA6009Sao Paulo62070503***63041F95
     </div>
 
     <button onclick="copiarPix()">📋 Copiar PIX</button>
-
-    <p id="msg"></p>
+    <div id="msg"></div>
   </div>
 
   <script>
     function copiarPix() {
       const texto = document.getElementById("pix").innerText;
       navigator.clipboard.writeText(texto).then(() => {
-        document.getElementById("msg").innerText = "PIX copiado com sucesso ✅";
+        document.getElementById("msg").innerText = "Código PIX copiado com sucesso ✅";
       }).catch(() => {
         document.getElementById("msg").innerText = "Não foi possível copiar automaticamente ❌";
       });
@@ -114,5 +139,6 @@
 
 </body>
 </html>
+
 
 
