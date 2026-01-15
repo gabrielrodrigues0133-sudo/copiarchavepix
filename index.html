@@ -7,8 +7,6 @@
 
 <style>
 :root{
-  --bg:#020617;
-  --card:#020617;
   --green:#22c55e;
   --green2:#4ade80;
   --text:#e5e7eb;
@@ -22,22 +20,22 @@ body{
   background:radial-gradient(circle at top,#0f172a,#020617);
   color:var(--text);
   display:flex;
-  align-items:center;
   justify-content:center;
+  align-items:center;
   padding:16px;
 }
 
-.container{width:100%;max-width:420px}
+.container{max-width:420px;width:100%}
 
 .card{
-  background:linear-gradient(180deg,#020617,#020617);
+  background:#020617;
   border-radius:22px;
   padding:22px;
-  box-shadow:0 0 50px rgba(34,197,94,.2);
-  border:1px solid rgba(34,197,94,.25);
+  border:1px solid rgba(34,197,94,.3);
+  box-shadow:0 0 40px rgba(34,197,94,.25);
 }
 
-.header{text-align:center;margin-bottom:16px}
+.header{text-align:center}
 .badge{
   display:inline-block;
   padding:6px 16px;
@@ -46,30 +44,23 @@ body{
   color:var(--green2);
   font-size:13px;
 }
-h1{font-size:22px;margin:10px 0;color:var(--green2)}
-.timer{margin-top:10px;font-size:14px;color:#facc15}
+h1{color:var(--green2);margin:10px 0}
+.timer{color:#facc15;font-size:14px}
 
 .box{
-  background:#020617;
-  border-radius:16px;
-  padding:16px;
   margin-top:16px;
+  padding:16px;
+  border-radius:16px;
   border:1px solid rgba(148,163,184,.15);
 }
 
 .row{
   display:flex;
   justify-content:space-between;
-  gap:12px;
-  font-size:15px;
   margin-bottom:10px;
 }
 
-.value{
-  font-size:26px;
-  font-weight:bold;
-  color:var(--green2);
-}
+.value{font-size:26px;color:var(--green2);font-weight:bold}
 
 .qr{text-align:center;margin-top:18px}
 .qr img{
@@ -82,11 +73,10 @@ h1{font-size:22px;margin:10px 0;color:var(--green2)}
 
 .pix{
   margin-top:16px;
-  font-size:13px;
-  word-break:break-all;
-  background:#020617;
   padding:12px;
   border-radius:12px;
+  font-size:13px;
+  word-break:break-all;
   border:1px solid rgba(148,163,184,.2);
 }
 
@@ -98,16 +88,9 @@ button{
   border-radius:16px;
   background:linear-gradient(135deg,var(--green),var(--green2));
   color:#022c22;
-  font-weight:bold;
   font-size:16px;
+  font-weight:bold;
   cursor:pointer;
-}
-
-footer{
-  margin-top:14px;
-  text-align:center;
-  font-size:12px;
-  color:var(--muted);
 }
 </style>
 </head>
@@ -116,7 +99,7 @@ footer{
 <div class="container">
   <div class="card">
     <div class="header">
-      <div class="badge">NEGOCIAÇÃO ATIVA</div>
+      <div class="badge">NEGOCIAÇÃO NIO FIBRA</div>
       <h1>Pagamento via PIX</h1>
       <div class="timer" id="contador">Carregando...</div>
     </div>
@@ -124,60 +107,61 @@ footer{
     <div class="box">
       <div class="row"><span>Nome</span><span id="nome">—</span></div>
       <div class="row"><span>CPF/CNPJ</span><span id="documento">—</span></div>
-      <div class="row">
-        <span>Valor</span>
-        <span class="value">R$ <span id="valor">0,00</span></span>
-      </div>
+      <div class="row"><span>Valor</span><span class="value">R$ <span id="valor">0,00</span></span></div>
     </div>
 
     <div class="qr"><img id="qrcode"></div>
     <div class="pix" id="pix">—</div>
     <button onclick="copiarPix()">COPIAR CHAVE PIX</button>
-    <footer>Esta negociação expira automaticamente</footer>
   </div>
 </div>
 
 <script>
-const p=new URLSearchParams(location.search);
-const nome=p.get("nome")||"—";
-const doc=p.get("doc")||"—";
-const valor=p.get("valor")||"0.00";
-const pix=p.get("pix")||"";
-const id=p.get("id")||"default";
+const params = new URLSearchParams(location.search);
 
-nomeEl.textContent=decodeURIComponent(nome);
-documento.textContent=decodeURIComponent(doc);
-valorEl.textContent=parseFloat(valor).toFixed(2).replace(".",",");
-pixEl.textContent=decodeURIComponent(pix);
-qrcode.src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data="+encodeURIComponent(pix);
+const nome = decodeURIComponent(params.get("nome") || "—");
+const doc = decodeURIComponent(params.get("doc") || "—");
+const valor = params.get("valor") || "0";
+const pix = decodeURIComponent(params.get("pix") || "");
+const id = params.get("id") || "default";
 
-// ⏳ EXPIRA EM 1 HORA (REAL)
-const KEY="exp_"+id;
-let exp=localStorage.getItem(KEY);
-if(!exp){exp=Date.now()+3600000;localStorage.setItem(KEY,exp);}
+document.getElementById("nome").textContent = nome;
+document.getElementById("documento").textContent = doc;
+document.getElementById("valor").textContent = parseFloat(valor).toFixed(2).replace(".", ",");
+document.getElementById("pix").textContent = pix;
 
-setInterval(()=>{
-  const d=exp-Date.now();
-  if(d<=0){contador.textContent="❌ Negociação expirada";return;}
-  const m=Math.floor(d/60000);
-  const s=Math.floor((d%60000)/1000);
-  contador.textContent=`⏳ Expira em ${m}m ${s}s`;
-},1000);
+document.getElementById("qrcode").src =
+  "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=" +
+  encodeURIComponent(pix);
+
+// ⏳ 1 HORA REAL
+const KEY = "exp_" + id;
+let exp = localStorage.getItem(KEY);
+if (!exp) {
+  exp = Date.now() + 3600000;
+  localStorage.setItem(KEY, exp);
+}
+
+setInterval(() => {
+  const diff = exp - Date.now();
+  if (diff <= 0) {
+    document.getElementById("contador").textContent = "❌ Negociação expirada";
+    return;
+  }
+  const m = Math.floor(diff / 60000);
+  const s = Math.floor((diff % 60000) / 1000);
+  document.getElementById("contador").textContent = `⏳ Expira em ${m}m ${s}s`;
+}, 1000);
 
 function copiarPix(){
   navigator.clipboard.writeText(pix);
   alert("Chave PIX copiada");
 }
-
-const nomeEl=document.getElementById("nome");
-const documento=document.getElementById("documento");
-const valorEl=document.getElementById("valor");
-const pixEl=document.getElementById("pix");
-const qrcode=document.getElementById("qrcode");
-const contador=document.getElementById("contador");
 </script>
 </body>
 </html>
+
+
 
 
 
