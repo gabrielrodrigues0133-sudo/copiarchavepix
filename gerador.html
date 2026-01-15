@@ -6,38 +6,72 @@
 <title>Gerador PIX</title>
 
 <style>
-body{
+*{
+  box-sizing:border-box;
+  font-family:Arial, Helvetica, sans-serif;
+}
+
+html, body{
+  width:100%;
+  height:100%;
   margin:0;
-  min-height:100vh;
+}
+
+body{
   background:radial-gradient(circle at top,#0f172a,#020617);
   display:flex;
-  justify-content:center;
   align-items:center;
+  justify-content:center;
   padding:16px;
-  font-family:Arial,Helvetica,sans-serif;
   color:#e5e7eb;
 }
-.card{
-  max-width:420px;
+
+/* CONTAINER CENTRAL */
+.wrapper{
   width:100%;
+  max-width:420px;
+}
+
+/* CARD */
+.card{
   background:#020617;
-  padding:28px;
   border-radius:22px;
+  padding:26px;
   border:1px solid rgba(34,197,94,.3);
   box-shadow:0 0 40px rgba(34,197,94,.25);
 }
-h1{text-align:center;color:#4ade80;margin-bottom:20px}
-label{font-size:13px;color:#94a3b8}
-input,textarea{
+
+/* TÍTULO */
+h1{
+  text-align:center;
+  color:#4ade80;
+  margin-bottom:24px;
+}
+
+/* FORM */
+label{
+  font-size:13px;
+  color:#94a3b8;
+}
+
+input, textarea{
   width:100%;
   padding:14px;
+  margin-top:6px;
+  margin-bottom:18px;
   border-radius:14px;
   border:1px solid rgba(148,163,184,.25);
   background:#020617;
   color:#e5e7eb;
-  margin-bottom:16px;
+  font-size:14px;
 }
-textarea{min-height:90px}
+
+textarea{
+  min-height:90px;
+  resize:none;
+}
+
+/* BOTÃO */
 button{
   width:100%;
   padding:16px;
@@ -49,63 +83,85 @@ button{
   font-weight:bold;
   cursor:pointer;
 }
-.result{display:none;margin-top:16px}
+
+/* RESULTADO */
+.result{
+  display:none;
+  margin-top:18px;
+}
+
+.result textarea{
+  font-size:13px;
+}
 </style>
 </head>
 
 <body>
-<div class="card">
-  <h1>🔗 Gerador PIX</h1>
 
-  <label>Nome</label>
-  <input id="nome">
+<div class="wrapper">
+  <div class="card">
 
-  <label>CPF ou CNPJ</label>
-  <input id="doc">
+    <h1>🔗 Gerador PIX</h1>
 
-  <label>Valor</label>
-  <input id="valor">
+    <label>Nome</label>
+    <input id="nome" placeholder="Nome do cliente">
 
-  <label>Chave PIX</label>
-  <textarea id="pix"></textarea>
+    <label>CPF ou CNPJ</label>
+    <input id="doc" placeholder="000.000.000-00">
 
-  <button onclick="gerar()">GERAR LINK</button>
+    <label>Valor</label>
+    <input id="valor" placeholder="149.00">
 
-  <div class="result" id="res">
-    <label>Link gerado</label>
-    <textarea id="link" readonly></textarea>
-    <button onclick="copiar()">📋 Copiar link</button>
+    <label>Chave PIX</label>
+    <textarea id="pix" placeholder="Cole a chave PIX aqui"></textarea>
+
+    <button onclick="gerar()">GERAR LINK</button>
+
+    <div class="result" id="resultado">
+      <label>Link gerado</label>
+      <textarea id="link" readonly></textarea>
+      <button style="margin-top:10px" onclick="copiar()">📋 Copiar link</button>
+    </div>
+
   </div>
 </div>
 
 <script>
 function gerar(){
-  const nome = document.getElementById("nome").value.trim();
-  const doc = document.getElementById("doc").value.trim();
+  const nome  = document.getElementById("nome").value.trim();
+  const doc   = document.getElementById("doc").value.trim();
   const valor = document.getElementById("valor").value.trim();
-  const pix = document.getElementById("pix").value.trim();
+  const pix   = document.getElementById("pix").value.trim();
 
   if(!nome || !valor || !pix){
-    alert("Preencha todos os campos obrigatórios");
+    alert("Preencha Nome, Valor e Chave PIX");
     return;
   }
 
   const id = "neg_" + Date.now();
+
   const base = location.origin + location.pathname.replace("gerador.html","");
-  const link = `${base}?id=${id}&nome=${encodeURIComponent(nome)}&doc=${encodeURIComponent(doc)}&valor=${encodeURIComponent(valor)}&pix=${encodeURIComponent(pix)}`;
+  const link =
+    `${base}?id=${id}` +
+    `&nome=${encodeURIComponent(nome)}` +
+    `&doc=${encodeURIComponent(doc)}` +
+    `&valor=${encodeURIComponent(valor)}` +
+    `&pix=${encodeURIComponent(pix)}`;
 
   document.getElementById("link").value = link;
-  document.getElementById("res").style.display = "block";
+  document.getElementById("resultado").style.display = "block";
 }
 
 function copiar(){
-  const l = document.getElementById("link");
-  l.select();
+  const campo = document.getElementById("link");
+  campo.select();
   document.execCommand("copy");
   alert("Link copiado");
 }
 </script>
+
 </body>
 </html>
+
 
 
