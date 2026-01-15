@@ -11,36 +11,23 @@ body{
   min-height:100vh;
   background:radial-gradient(circle at top,#0f172a,#020617);
   display:flex;
-  align-items:center;
   justify-content:center;
+  align-items:center;
   padding:16px;
   font-family:Arial,Helvetica,sans-serif;
   color:#e5e7eb;
 }
-
 .card{
-  width:100%;
   max-width:420px;
+  width:100%;
   background:#020617;
   padding:28px;
   border-radius:22px;
   border:1px solid rgba(34,197,94,.3);
-  box-shadow:0 0 50px rgba(34,197,94,.25);
+  box-shadow:0 0 40px rgba(34,197,94,.25);
 }
-
-h1{
-  text-align:center;
-  color:#4ade80;
-  margin-bottom:20px;
-}
-
-label{
-  font-size:13px;
-  color:#94a3b8;
-  margin-bottom:6px;
-  display:block;
-}
-
+h1{text-align:center;color:#4ade80;margin-bottom:20px}
+label{font-size:13px;color:#94a3b8}
 input,textarea{
   width:100%;
   padding:14px;
@@ -49,11 +36,8 @@ input,textarea{
   background:#020617;
   color:#e5e7eb;
   margin-bottom:16px;
-  font-size:15px;
 }
-
-textarea{min-height:90px;resize:vertical}
-
+textarea{min-height:90px}
 button{
   width:100%;
   padding:16px;
@@ -61,11 +45,10 @@ button{
   border-radius:16px;
   background:linear-gradient(135deg,#22c55e,#4ade80);
   color:#022c22;
-  font-weight:bold;
   font-size:16px;
+  font-weight:bold;
   cursor:pointer;
 }
-
 .result{display:none;margin-top:16px}
 </style>
 </head>
@@ -96,25 +79,33 @@ button{
 </div>
 
 <script>
-const nomeI=nome,docI=doc,valorI=valor,pixI=pix,linkI=link,resI=res;
-
 function gerar(){
-  if(!nomeI.value||!valorI.value||!pixI.value){
-    alert("Preencha todos os campos");
+  const nome = document.getElementById("nome").value.trim();
+  const doc = document.getElementById("doc").value.trim();
+  const valor = document.getElementById("valor").value.trim();
+  const pix = document.getElementById("pix").value.trim();
+
+  if(!nome || !valor || !pix){
+    alert("Preencha todos os campos obrigatórios");
     return;
   }
-  const id="neg_"+Date.now();
-  const base=location.origin+location.pathname.replace("gerador.html","");
-  linkI.value=`${base}?id=${id}&nome=${encodeURIComponent(nomeI.value)}&doc=${encodeURIComponent(docI.value)}&valor=${encodeURIComponent(valorI.value)}&pix=${encodeURIComponent(pixI.value)}`;
-  resI.style.display="block";
+
+  const id = "neg_" + Date.now();
+  const base = location.origin + location.pathname.replace("gerador.html","");
+  const link = `${base}?id=${id}&nome=${encodeURIComponent(nome)}&doc=${encodeURIComponent(doc)}&valor=${encodeURIComponent(valor)}&pix=${encodeURIComponent(pix)}`;
+
+  document.getElementById("link").value = link;
+  document.getElementById("res").style.display = "block";
 }
 
 function copiar(){
-  linkI.select();
+  const l = document.getElementById("link");
+  l.select();
   document.execCommand("copy");
   alert("Link copiado");
 }
 </script>
 </body>
 </html>
+
 
