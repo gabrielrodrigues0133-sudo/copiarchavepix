@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Gerador PIX</title>
+<title>Gerador PIX Seguro</title>
 <style>
 *{box-sizing:border-box;font-family:Arial,Helvetica,sans-serif}
 html,body{width:100%;height:100%;margin:0}
@@ -38,7 +38,7 @@ button{
 <body>
 <div class="wrapper">
   <div class="card">
-    <h1>🔗 Gerador PIX</h1>
+    <h1>🔗 Gerador PIX Seguro</h1>
 
     <label>Nome</label>
     <input id="nome" placeholder="Nome do cliente">
@@ -64,18 +64,24 @@ button{
 
 <script>
 function gerar(){
-  const nome  = encodeURIComponent(document.getElementById("nome").value.trim());
-  const doc   = encodeURIComponent(document.getElementById("doc").value.trim());
-  const valor = encodeURIComponent(document.getElementById("valor").value.trim());
-  const pix   = encodeURIComponent(document.getElementById("pix").value.trim());
+  const nome  = document.getElementById("nome").value.trim();
+  const doc   = document.getElementById("doc").value.trim();
+  const valor = document.getElementById("valor").value.trim();
+  const pix   = document.getElementById("pix").value.trim();
 
   if(!nome || !valor || !pix){
     alert("Preencha Nome, Valor e Chave PIX");
     return;
   }
 
+  // 🔹 Criar objeto e codificar em Base64
+  const data = { nome, doc, valor, pix };
+  const jsonStr = JSON.stringify(data);
+  const encoded = btoa(encodeURIComponent(jsonStr));
+
+  // 🔹 Gerar link
   const base = new URL("gerador.html", window.location.href).href;
-  const link = `${base}?nome=${nome}&doc=${doc}&valor=${valor}&pix=${pix}`;
+  const link = `${base}?d=${encoded}`;
 
   document.getElementById("link").value = link;
   document.getElementById("resultado").style.display = "block";
@@ -84,13 +90,14 @@ function gerar(){
 function copiar(){
   const campo = document.getElementById("link");
   campo.select();
-  campo.setSelectionRange(0, 99999); // Para mobile
+  campo.setSelectionRange(0, 99999); // Mobile
   document.execCommand("copy");
   alert("Link copiado");
 }
 </script>
 </body>
 </html>
+
 
 
 
