@@ -63,7 +63,7 @@ button{
 </div>
 
 <script>
-// 🔹 Função para limpar dados expirados do localStorage
+// 🔹 Limpa dados expirados do localStorage
 function limparLocalStorageAntigos() {
   const agora = Date.now();
   for(let i=0;i<localStorage.length;i++){
@@ -99,7 +99,7 @@ function gerar(){
   localStorage.setItem(id, JSON.stringify(data));
   localStorage.setItem("exp_" + id, Date.now() + 3600000); // Expira em 1 hora
 
-  // 🔹 Gera link curto
+  // 🔹 Gera link completo
   const base = new URL("gerador.html", window.location.href).href;
   const link = `${base}?id=${id}`;
 
@@ -110,6 +110,7 @@ function gerar(){
 function copiar(){
   const campo = document.getElementById("link");
   campo.select();
+  campo.setSelectionRange(0, 99999); // Para mobile
   document.execCommand("copy");
   alert("Link copiado");
 }
