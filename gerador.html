@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -70,7 +70,7 @@ button{
       </div>
     </div>
 
-    <div class="qr"><img id="qrcode"></div>
+    <div class="qr"><img id="qrcode" alt="QR Code PIX"></div>
     <div class="pix" id="pix">—</div>
     <button onclick="copiarPix()">COPIAR CHAVE PIX</button>
   </div>
@@ -81,78 +81,77 @@ const params = new URLSearchParams(location.search);
 const id = params.get("id");
 
 if(!id){
-  alert("Link inválido");
-  throw new Error("ID não encontrado");
-}
-
-// 🔹 Limpeza automática de itens antigos
-function limparLocalStorageAntigos() {
-  const agora = Date.now();
-  for(let i=0;i<localStorage.length;i++){
-    const key = localStorage.key(i);
-    if(!key) continue;
-    if(key.startsWith("neg_")){
-      const expKey = "exp_" + key;
-      const exp = parseInt(localStorage.getItem(expKey));
-      if(exp && agora > exp){
-        localStorage.removeItem(key);
-        localStorage.removeItem(expKey);
+  document.getElementById("contador").textContent = "❌ Link inválido";
+} else {
+  // Limpa dados expirados
+  (function(){
+    const agora = Date.now();
+    for(let i=0;i<localStorage.length;i++){
+      const key = localStorage.key(i);
+      if(!key) continue;
+      if(key.startsWith("neg_")){
+        const expKey = "exp_" + key;
+        const exp = parseInt(localStorage.getItem(expKey));
+        if(exp && agora > exp){
+          localStorage.removeItem(key);
+          localStorage.removeItem(expKey);
+        }
       }
     }
+  })();
+
+  const saved = localStorage.getItem(id);
+  if(!saved){
+    document.getElementById("contador").textContent = "❌ Dados não encontrados ou expirados";
+  } else {
+    const data = JSON.parse(saved);
+    const { nome = "—", doc = "—", valor = 0, pix = "—" } = data;
+
+    document.getElementById("nome").textContent = nome;
+    document.getElementById("documento").textContent = doc;
+    document.getElementById("valor").textContent =
+      (isNaN(parseFloat(valor)) ? 0 : parseFloat(valor)).toFixed(2).replace(".", ",");
+    document.getElementById("pix").textContent = pix;
+
+    if(pix !== "—"){
+      document.getElementById("qrcode").src =
+        "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=" +
+        encodeURIComponent(pix);
+    }
+
+    const KEY = "exp_" + id;
+    let exp = localStorage.getItem(KEY);
+    if(!exp){
+      exp = Date.now() + 3600000;
+      localStorage.setItem(KEY, exp);
+    }
+
+    const contador = document.getElementById("contador");
+    const interval = setInterval(()=>{
+      const diff = exp - Date.now();
+      if(diff <= 0){
+        contador.textContent = "❌ Negociação expirada";
+        localStorage.removeItem(id);
+        localStorage.removeItem(KEY);
+        clearInterval(interval);
+        return;
+      }
+      const m = Math.floor(diff/60000);
+      const s = Math.floor((diff%60000)/1000);
+      contador.textContent = `⏳ Expira em ${m}m ${s}s`;
+    },1000);
+
+    window.copiarPix = function(){
+      navigator.clipboard.writeText(pix)
+        .then(()=>alert("Chave PIX copiada"))
+        .catch(()=>alert("Falha ao copiar a chave PIX"));
+    }
   }
-}
-limparLocalStorageAntigos();
-
-// 🔹 Recupera dados pelo ID
-const saved = localStorage.getItem(id);
-if(!saved){
-  alert("Dados não encontrados ou expirados");
-  throw new Error("Dados não encontrados");
-}
-const data = JSON.parse(saved);
-const { nome, doc, valor, pix } = data;
-
-// Atualiza elementos da página
-document.getElementById("nome").textContent = nome;
-document.getElementById("documento").textContent = doc;
-document.getElementById("valor").textContent =
-  (isNaN(parseFloat(valor)) ? 0 : parseFloat(valor)).toFixed(2).replace(".", ",");
-
-document.getElementById("pix").textContent = pix;
-
-// QR Code
-document.getElementById("qrcode").src =
-  "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=" +
-  encodeURIComponent(pix);
-
-// Timer de 1 hora
-const KEY = "exp_" + id;
-let exp = localStorage.getItem(KEY);
-if(!exp){
-  exp = Date.now() + 3600000;
-  localStorage.setItem(KEY, exp);
-}
-setInterval(()=>{
-  const diff = exp - Date.now();
-  if(diff <= 0){
-    document.getElementById("contador").textContent = "❌ Negociação expirada";
-    // Remove dados expirados
-    localStorage.removeItem(id);
-    localStorage.removeItem(KEY);
-    return;
-  }
-  const m = Math.floor(diff/60000);
-  const s = Math.floor((diff%60000)/1000);
-  document.getElementById("contador").textContent = `⏳ Expira em ${m}m ${s}s`;
-},1000);
-
-function copiarPix(){
-  navigator.clipboard.writeText(pix);
-  alert("Chave PIX copiada");
 }
 </script>
 </body>
 </html>
+
 
 
 
