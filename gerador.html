@@ -77,47 +77,59 @@ button{
 </div>
 
 <script>
-function getParam(name){
-  return decodeURIComponent(new URLSearchParams(location.search).get(name) || '');
-}
-
-const nome  = getParam('nome') || '—';
-const doc   = getParam('doc') || '—';
-const valor = getParam('valor') || '0.00';
-const pix   = getParam('pix') || '—';
-
-// Atualiza a tela
-document.getElementById('nome').textContent = nome;
-document.getElementById('documento').textContent = doc;
-document.getElementById('valor').textContent = parseFloat(valor).toFixed(2).replace('.', ',');
-
-document.getElementById('pix').textContent = pix;
-if(pix !== '—'){
-  document.getElementById('qrcode').src =
-    "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=" +
-    encodeURIComponent(pix);
-}
-
-// Timer de 1 hora
-const start = Date.now();
-const end = start + 3600000; // 1 hora
-const contador = document.getElementById('contador');
-const interval = setInterval(()=>{
-  const diff = end - Date.now();
-  if(diff <= 0){
-    contador.textContent = "❌ Negociação expirada";
-    clearInterval(interval);
-    return;
+function getDataFromURL(){
+  const d = new URLSearchParams(location.search).get('d');
+  if(!d) return null;
+  try{
+    const jsonStr = decodeURIComponent(atob(d));
+    return JSON.parse(jsonStr);
+  }catch(e){
+    return null;
   }
-  const m = Math.floor(diff/60000);
-  const s = Math.floor((diff%60000)/1000);
-  contador.textContent = `⏳ Expira em ${m}m ${s}s`;
-},1000);
+}
 
-// Função copiar PIX
-function copiarPix(){
-  navigator.clipboard.writeText(pix)
-    .then(()=>alert('Chave PIX copiada'
+const data = getDataFromURL();
+if(!data){
+  document.getElementById('contador').textContent = '❌ Link inválido ou quebrado';
+} else {
+  const { nome, doc, valor, pix } = data;
+
+  document.getElementById('nome').textContent = nome;
+  document.getElementById('documento').textContent = doc;
+  document.getElementById('valor').textContent = parseFloat(valor).toFixed(2).replace('.', ',');
+
+  document.getElementById('pix').textContent = pix;
+
+  if(pix !== '—'){
+    document.getElementById('qrcode').src =
+      "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=" +
+      encodeURIComponent(pix);
+  }
+
+  // Timer de 1 hora
+  const end = Date.now() + 3600000;
+  const contador = document.getElementById('contador');
+  const interval = setInterval(()=>{
+    const diff = end - Date.now();
+    if(diff <= 0){
+      contador.textContent = "❌ Negociação expirada";
+      clearInterval(interval);
+      return;
+    }
+    const m = Math.floor(diff/60000);
+    const s = Math.floor((diff%60000)/1000);
+    contador.textContent = `⏳ Expira em ${m}m ${s}s`;
+  },1000);
+
+  // Copiar PIX
+  window.copiarPix = function(){
+    navigator.clipboard.writeText(pix).then(()=>alert("Chave PIX copiada"));
+  }
+}
+</script>
+</body>
+</html>
+
 
 
 
