@@ -58,7 +58,7 @@ button{
     <div class="header">
       <div class="badge">NEGOCIAÇÃO NIO FIBRA</div>
       <h1>Pagamento via PIX</h1>
-      <div class="timer" id="contador">Carregando...</div>
+      <div class="timer" id="contador">⏳ Validade: 1 hora</div>
     </div>
 
     <div class="box">
@@ -77,80 +77,48 @@ button{
 </div>
 
 <script>
-const params = new URLSearchParams(location.search);
-const id = params.get("id");
-
-if(!id){
-  document.getElementById("contador").textContent = "❌ Link inválido";
-} else {
-  // Limpa dados expirados
-  (function(){
-    const agora = Date.now();
-    for(let i=0;i<localStorage.length;i++){
-      const key = localStorage.key(i);
-      if(!key) continue;
-      if(key.startsWith("neg_")){
-        const expKey = "exp_" + key;
-        const exp = parseInt(localStorage.getItem(expKey));
-        if(exp && agora > exp){
-          localStorage.removeItem(key);
-          localStorage.removeItem(expKey);
-        }
-      }
-    }
-  })();
-
-  const saved = localStorage.getItem(id);
-  if(!saved){
-    document.getElementById("contador").textContent = "❌ Dados não encontrados ou expirados";
-  } else {
-    const data = JSON.parse(saved);
-    const { nome = "—", doc = "—", valor = 0, pix = "—" } = data;
-
-    document.getElementById("nome").textContent = nome;
-    document.getElementById("documento").textContent = doc;
-    document.getElementById("valor").textContent =
-      (isNaN(parseFloat(valor)) ? 0 : parseFloat(valor)).toFixed(2).replace(".", ",");
-    document.getElementById("pix").textContent = pix;
-
-    if(pix !== "—"){
-      document.getElementById("qrcode").src =
-        "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=" +
-        encodeURIComponent(pix);
-    }
-
-    const KEY = "exp_" + id;
-    let exp = localStorage.getItem(KEY);
-    if(!exp){
-      exp = Date.now() + 3600000;
-      localStorage.setItem(KEY, exp);
-    }
-
-    const contador = document.getElementById("contador");
-    const interval = setInterval(()=>{
-      const diff = exp - Date.now();
-      if(diff <= 0){
-        contador.textContent = "❌ Negociação expirada";
-        localStorage.removeItem(id);
-        localStorage.removeItem(KEY);
-        clearInterval(interval);
-        return;
-      }
-      const m = Math.floor(diff/60000);
-      const s = Math.floor((diff%60000)/1000);
-      contador.textContent = `⏳ Expira em ${m}m ${s}s`;
-    },1000);
-
-    window.copiarPix = function(){
-      navigator.clipboard.writeText(pix)
-        .then(()=>alert("Chave PIX copiada"))
-        .catch(()=>alert("Falha ao copiar a chave PIX"));
-    }
-  }
+function getParam(name){
+  return decodeURIComponent(new URLSearchParams(location.search).get(name) || '');
 }
-</script>
-</body>
-</html>
+
+const nome  = getParam('nome') || '—';
+const doc   = getParam('doc') || '—';
+const valor = getParam('valor') || '0.00';
+const pix   = getParam('pix') || '—';
+
+// Atualiza a tela
+document.getElementById('nome').textContent = nome;
+document.getElementById('documento').textContent = doc;
+document.getElementById('valor').textContent = parseFloat(valor).toFixed(2).replace('.', ',');
+
+document.getElementById('pix').textContent = pix;
+if(pix !== '—'){
+  document.getElementById('qrcode').src =
+    "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=" +
+    encodeURIComponent(pix);
+}
+
+// Timer de 1 hora
+const start = Date.now();
+const end = start + 3600000; // 1 hora
+const contador = document.getElementById('contador');
+const interval = setInterval(()=>{
+  const diff = end - Date.now();
+  if(diff <= 0){
+    contador.textContent = "❌ Negociação expirada";
+    clearInterval(interval);
+    return;
+  }
+  const m = Math.floor(diff/60000);
+  const s = Math.floor((diff%60000)/1000);
+  contador.textContent = `⏳ Expira em ${m}m ${s}s`;
+},1000);
+
+// Função copiar PIX
+function copiarPix(){
+  navigator.clipboard.writeText(pix)
+    .then(()=>alert('Chave PIX copiada'
+
 
 
 
